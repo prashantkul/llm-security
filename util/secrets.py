@@ -7,19 +7,22 @@ from util.googleauth import GoogleAuthManager
 class GoogleSecretManagerAPIKey:
     SUPPORTED_SERVICES = ["google", "anthropic", "openai", "huggingface"]
 
-    def __init__(self, project_id: str):
+    def __init__(self, project_id: str, auth: GoogleAuthManager = None):
         sa_key_path = os.path.join(
             os.environ["SA_KEY_PATH"], os.environ["SA_KEY_NAME"]
         )
         self.project_id = project_id
         scopes = ["https://www.googleapis.com/auth/cloud-platform"]
-        self.auth_manager = GoogleAuthManager(scopes=scopes)
 
-        if sa_key_path:
-            self.auth_manager.set_service_account_key_file(sa_key_path)
+        if auth is None:
+            self.auth_manager = GoogleAuthManager(
+                key_file_path=sa_key_path, scopes=scopes
+            )
+
+        self.auth_manager = auth
 
         self.client = secretmanager.SecretManagerServiceClient(
-            credentials=self.auth_manager.get_credentials()
+            credentials=self.auth_manager.get_pure_credentials()
         )
 
     def _get_secret_name(self, service: str) -> str:

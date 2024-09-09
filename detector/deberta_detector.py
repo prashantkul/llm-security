@@ -7,7 +7,7 @@ import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-class AIModelTesterWithInjectionDetection:
+class DebertaTester:
     def __init__(self, model_test_function: Callable[[str, str], str]):
         self.model_test_function = model_test_function
         self.injection_detector = DebertaPromptInjectionDetector()
@@ -76,7 +76,7 @@ if __name__ == "__main__":
         # This is a placeholder. In a real scenario, this would call your AI models.
         return f"Response from {model_name}: This is a simulated response to '{prompt}'"
 
-    tester = AIModelTesterWithInjectionDetection(test_model)
+    tester = DebertaTester(test_model)
 
     # Example prompts
     test_prompts = [

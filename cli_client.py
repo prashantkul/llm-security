@@ -140,7 +140,6 @@ if __name__ == "__main__":
     # logging.basicConfig(level=logging.DEBUG)  # uncomment to debug the environment
     print("Loading .env file")
     _ = load_dotenv('local.env')
-    print("Environment variables loaded:", os.environ)  # Add this line
     # set Google Cloud project
     project_id = os.environ["GCP_PROJECT_ID"]
     if not project_id:
