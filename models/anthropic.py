@@ -1,10 +1,14 @@
-import openai
+import os
+import anthropic
 from typing import List, Dict, Optional
 
 
-class OpenAIGPTWrapper:
-    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo"):
-        openai.api_key = api_key
+class AnthropicClaudeWrapper:
+    def __init__(self, model: str = "claude-3-opus-20240229"):
+
+        if not api_key:
+            raise ValueError("Please set the ANTHROPIC_API_KEY environment variable.")
+        self.client = anthropic.Anthropic(api_key=api_key)
         self.model = model
         self.messages: List[Dict[str, str]] = []
 
@@ -21,24 +25,22 @@ class OpenAIGPTWrapper:
 
     def generate_response(
         self,
+        max_tokens: int = 1000,
         temperature: float = 0.7,
-        max_tokens: Optional[int] = None,
         top_p: float = 1.0,
-        frequency_penalty: float = 0.0,
-        presence_penalty: float = 0.0,
+        top_k: int = 50,
     ) -> str:
-        """Generate a response from the model."""
+        """Generate a response from Claude."""
         try:
-            response = openai.ChatCompletion.create(
+            response = self.client.messages.create(
                 model=self.model,
                 messages=self.messages,
-                temperature=temperature,
                 max_tokens=max_tokens,
+                temperature=temperature,
                 top_p=top_p,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty,
+                top_k=top_k,
             )
-            assistant_message = response["choices"][0]["message"]["content"]
+            assistant_message = response.content[0].text
             self.add_message("assistant", assistant_message)
             return assistant_message
         except Exception as e:
@@ -46,7 +48,7 @@ class OpenAIGPTWrapper:
 
     def chat(self, user_input: str) -> str:
         """Add a user message and generate a response."""
-        self.add_message("user", user_input)
+        self.add_message("human", user_input)
         return self.generate_response()
 
     def clear_conversation(self):

@@ -1,19 +1,30 @@
 from google.cloud import secretmanager
 from google.api_core import exceptions
 import os
-from typing import Optional
-
+from typing import List, Dict, Optional
+from util.googleauth import GoogleAuthManager
 
 class GoogleSecretManagerAPIKey:
-    SUPPORTED_SERVICES = ["google", "anthropic", "openai"]
+    SUPPORTED_SERVICES = ["google", "anthropic", "openai", "huggingface"]
 
     def __init__(self, project_id: str):
+        sa_key_path = os.path.join(
+            os.environ["SA_KEY_PATH"], os.environ["SA_KEY_NAME"]
+        )
         self.project_id = project_id
-        self.client = secretmanager.SecretManagerServiceClient()
+        scopes = ["https://www.googleapis.com/auth/cloud-platform"]
+        self.auth_manager = GoogleAuthManager(scopes=scopes)
+
+        if sa_key_path:
+            self.auth_manager.set_service_account_key_file(sa_key_path)
+
+        self.client = secretmanager.SecretManagerServiceClient(
+            credentials=self.auth_manager.get_credentials()
+        )
 
     def _get_secret_name(self, service: str) -> str:
         """Generate the full secret name."""
-        return f"projects/{self.project_id}/secrets/{service}_api_key/versions/latest"
+        return f"projects/82097005135/secrets/{service}_api_key/versions/latest"
 
     def _verify_service(self, service: str) -> bool:
         """Verify if the service is supported."""
@@ -93,6 +104,11 @@ class GoogleSecretManagerAPIKey:
         """Retrieve all supported API keys."""
         return {service: self.get_key(service) for service in self.SUPPORTED_SERVICES}
 
+    def list_secrets(self):
+        parent = f"projects/{self.project_id}"
+        secrets = self.client.list_secrets(request={"parent": parent})
+        return [secret.name for secret in secrets]
+
 
 # # Example usage:
 # if __name__ == "__main__":
@@ -133,3 +149,12 @@ class GoogleSecretManagerAPIKey:
 #     all_keys = key_manager.get_all_keys()
 #     for service, key in all_keys.items():
 #         print(f"{service.capitalize()}: {'*****' if key else 'Not set'}")
+
+# simple test to check IAM permissions
+# if __name__ == "__main__":
+#     # Make sure to set your Google Cloud project ID
+#     project_id = "pk-arg-prj1"
+
+#     key_manager = GoogleSecretManagerAPIKey(project_id=project_id)
+#     print(key_manager.list_secrets())
+#     print(key_manager.get_key(service="google"))

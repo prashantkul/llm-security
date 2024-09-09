@@ -5,9 +5,6 @@ from typing import List, Dict, Optional
 
 class GoogleGeminiWrapper:
     def __init__(self, model: str = "gemini-pro"):
-        api_key = os.getenv("GOOGLE_API_KEY")
-        if not api_key:
-            raise ValueError("Please set the GOOGLE_API_KEY environment variable.")
         genai.configure(api_key=api_key)
         self.model = genai.GenerativeModel(model)
         self.chat = self.model.start_chat(history=[])
