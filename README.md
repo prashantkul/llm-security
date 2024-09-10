@@ -1,5 +1,5 @@
 # llm-security
-This repository contains the code to test various issues with LLM prompts
+This repository contains the code to test various security issues with LLM prompts
 
 ## Features
 - Google Cloud Model Armor for a comprehensive prompt attacks.
