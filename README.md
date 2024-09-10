@@ -9,7 +9,7 @@ This repository contains the code to test various issues with LLM prompts
 - Huggingface
 - Google Gemini
 - OpenAI GPT
-- Anthropoc Claude
+- Anthropic Claude
 
 ## Requirements
 - Need a Google Cloud project that is enabled for Model Armor
