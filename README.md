@@ -15,6 +15,15 @@ This repository contains the code to test various security issues with LLM promp
 - Need a Google Cloud project that is enabled for Model Armor
 - Store API keys as a secrets in Google Cloud Secrets Manager
 
+## Input
+- Provide a local.env file containing following key-value pairs
+  - SA_KEY_PATH=<path-to-key-file>
+  - SA_KEY_NAME=sa-key.json
+  - GOOGLE_CLOUD_PROJECT=<project-id>
+  - MA_TEMPLATE_NAME=<template-name>
+  - REGION=us-central1
+  - PROMPT_CSV=<path>/prompts_and_labels.csv
+
 ## Output
 - Provides a command line output for various prompt detection
 - Generates a CSV file with summary.
