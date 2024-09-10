@@ -16,6 +16,8 @@ from dataclasses import dataclass
 import sys
 from colorama import init, Fore, Back, Style
 import pandas as pd
+import csv
+import re
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
@@ -56,7 +58,7 @@ class TestResult:
         return cls(
             prompt=prompt,
             model_name=model_name,
-            model_response=f"Potential {detection_type} detected. Model test skipped. Confidence: {confidence}",
+            model_response=f"Potential {detection_type} detected. Model willl NOT be called. Confidence: {confidence}",
             injection_detection=injection_result,
         )
 
@@ -212,6 +214,60 @@ def print_analysis(analysis):
             print(f"  {key}: {value}")
 
 
+def strip_ansi_codes(text):
+    """Remove ANSI color codes from the text."""
+    ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+    return ansi_escape.sub("", text)
+
+
+def flatten_test_result(result: TestResult) -> Dict:
+    flat_dict = result.to_dict()
+
+    # Flatten injection_detection
+    injection_detection = flat_dict.pop("injection_detection")
+    flat_dict["injection_detected"] = strip_ansi_codes(
+        injection_detection["injection_detected"]
+    )
+    flat_dict["injection_confidence"] = injection_detection["injection_confidence"]
+
+    # Handle other_detections
+    other_detections = injection_detection["other_detections"]
+    if other_detections:
+        flat_dict["other_detection_type"] = other_detections[0]["type"]
+        flat_dict["other_detection_confidence"] = other_detections[0]["confidence"]
+    else:
+        flat_dict["other_detection_type"] = ""
+        flat_dict["other_detection_confidence"] = ""
+
+    return flat_dict
+
+
+def save_results_to_csv(results, analysis, filename="test_results.csv"):
+    if not results:
+        print("No results to save.")
+        return
+
+    fieldnames = list(flatten_test_result(results[0]).keys())
+
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for result in results:
+            writer.writerow(flatten_test_result(result))
+
+        # Add analysis rows
+        writer.writerow({field: "" for field in fieldnames})  # Empty row for separation
+        writer.writerow({fieldnames[0]: "ANALYSIS"})  # Analysis header
+
+        for key, value in analysis.items():
+            if isinstance(value, dict):
+                writer.writerow({fieldnames[0]: key, fieldnames[1]: json.dumps(value)})
+            else:
+                writer.writerow({fieldnames[0]: key, fieldnames[1]: str(value)})
+
+    print(f"Results and analysis saved to {filename}")
+
+
 # Example usage:
 if __name__ == "__main__":
     print("Loading .env file")
@@ -243,7 +299,7 @@ if __name__ == "__main__":
     test_prmopt_df = pd.read_csv(csv_file_path)
     test_prompts = test_prmopt_df["prompt"].tolist()
 
-    # Run batch test 
+    # Run batch test
     results = tester.batch_test_with_injection_detection(["huggingface"], test_prompts)
 
     # Print results
@@ -254,5 +310,5 @@ if __name__ == "__main__":
     analysis = tester.analyze_results(results)
     print_analysis(analysis)
 
-    # Optionally, run an interactive session
-    # tester.run_interactive_session_with_injection_detection(["huggingface"])
+    print("Saving results to csv")
+    save_results_to_csv(results, analysis)
