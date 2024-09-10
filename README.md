@@ -29,9 +29,9 @@ This repository contains the code to test various security issues with LLM promp
 - Generates a CSV file with summary.
 
 ## Critical libraries versions
-Python==3.11.5
-transformers==4.40.0
-tensorflow==2.15.0
-keras==2.15.0
-torch==2.4.1
+- Python==3.11.5
+- transformers==4.40.0
+- tensorflow==2.15.0
+- keras==2.15.0
+- torch==2.4.1
 
