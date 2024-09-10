@@ -17,12 +17,12 @@ This repository contains the code to test various security issues with LLM promp
 
 ## Input
 - Provide a local.env file containing following key-value pairs
-  - SA_KEY_PATH=<path-to-key-file>
+  - SA_KEY_PATH=\<path-to-key-file\>
   - SA_KEY_NAME=sa-key.json
-  - GOOGLE_CLOUD_PROJECT=<project-id>
-  - MA_TEMPLATE_NAME=<template-name>
+  - GOOGLE_CLOUD_PROJECT=\<project-id\>
+  - MA_TEMPLATE_NAME=\<template-name\>
   - REGION=us-central1
-  - PROMPT_CSV=<path>/prompts_and_labels.csv
+  - PROMPT_CSV=\<path\>/prompts_and_labels.csv
 
 ## Output
 - Provides a command line output for various prompt detection
