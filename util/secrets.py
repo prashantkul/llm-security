@@ -3,9 +3,10 @@ from google.api_core import exceptions
 import os
 from typing import List, Dict, Optional
 from util.googleauth import GoogleAuthManager
+from dotenv import load_dotenv, find_dotenv
 
 class GoogleSecretManagerAPIKey:
-    SUPPORTED_SERVICES = ["google", "anthropic", "openai", "huggingface"]
+    SUPPORTED_SERVICES = ["google", "anthropic", "openai", "huggingface", "langsmith"]
 
     def __init__(self, project_id: str, auth: GoogleAuthManager = None):
         sa_key_path = os.path.join(
@@ -18,8 +19,8 @@ class GoogleSecretManagerAPIKey:
             self.auth_manager = GoogleAuthManager(
                 key_file_path=sa_key_path, scopes=scopes
             )
-
-        self.auth_manager = auth
+        else:
+            self.auth_manager = auth
 
         self.client = secretmanager.SecretManagerServiceClient(
             credentials=self.auth_manager.get_pure_credentials()
@@ -153,11 +154,11 @@ class GoogleSecretManagerAPIKey:
 #     for service, key in all_keys.items():
 #         print(f"{service.capitalize()}: {'*****' if key else 'Not set'}")
 
-# simple test to check IAM permissions
+# # simple test to check IAM permissions
 # if __name__ == "__main__":
 #     # Make sure to set your Google Cloud project ID
-#     project_id = "pk-arg-prj1"
-
+#     load_dotenv("local.env")
+#     project_id = os.environ["GOOGLE_CLOUD_PROJECT"]
 #     key_manager = GoogleSecretManagerAPIKey(project_id=project_id)
 #     print(key_manager.list_secrets())
 #     print(key_manager.get_key(service="google"))

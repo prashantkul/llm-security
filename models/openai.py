@@ -1,9 +1,11 @@
-import openai
+from openai import OpenAI
 from typing import List, Dict, Optional
 
 
 class OpenAIGPTWrapper:
-    def __init__(self, model: str = "gpt-3.5-turbo"):
+
+    def __init__(self, api_key: str, model: str = "gpt-3.5-turbo"):
+        self.client = OpenAI(api_key=api_key)
         self.model = model
         self.messages: List[Dict[str, str]] = []
 
@@ -28,7 +30,7 @@ class OpenAIGPTWrapper:
     ) -> str:
         """Generate a response from the model."""
         try:
-            response = openai.ChatCompletion.create(
+            response = self.client.chat.completions.create(
                 model=self.model,
                 messages=self.messages,
                 temperature=temperature,
@@ -37,7 +39,7 @@ class OpenAIGPTWrapper:
                 frequency_penalty=frequency_penalty,
                 presence_penalty=presence_penalty,
             )
-            assistant_message = response["choices"][0]["message"]["content"]
+            assistant_message = response.choices[0].message.content
             self.add_message("assistant", assistant_message)
             return assistant_message
         except Exception as e:
