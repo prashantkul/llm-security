@@ -9,6 +9,7 @@ The detectors and LLMs are invoked via Langchain. LangSmith is used for visualiz
 ## Features
 - Google Cloud Model Armor for a comprehensive prompt attacks. (Feature in Private preview, not yet GA)
 - Huggingface DeBerta model for prompt injection detection.
+- LangChain and LangSmith integration to show the flow of the verifications
 
 ## Models
 - Huggingface
