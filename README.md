@@ -1,6 +1,8 @@
 # llm-security
-This repository contains the code to test various security issues with LLM prompts. It shows how to invoke these detectors independantly and via LangChain.
+This repository contains the code to test various security issues with LLM prompts. It has detectors to detect these issues. It shows how to invoke these detectors independantly and via LangChain.
+
 Following detectors are available:
+- Google Cloud Armor product for content safety and prompt injection detection
 - Prompt injection using '<aprotectai/deberta-v3-base-prompt-injection-v2'
 - Various other issues like hate speech, profanity, harassement, firearms and weapons, public safety etc. 
 
